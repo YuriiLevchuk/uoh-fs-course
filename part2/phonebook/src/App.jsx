@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import noteServices from './services/notes'
 import axios from 'axios'
 
 import Filter from './components/Filter'
@@ -6,38 +7,61 @@ import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 
 const App = () => {
+  //hooks
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchBar, setSearhBar] = useState('')
 
   useEffect(()=>{
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data);
-      })
+    noteServices.GETrequest()
+      .then(x => { setPersons(x) })
   }, [])
 
+  //add record
   const addRecord = (event) => {
     event.preventDefault();
-
-    if (persons.findIndex(el => el.name === newName) !== -1){
-      alert(`${newName} is already added to phonebook`);
-      return 0;
-    }
 
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: (persons.length + 1)
     };
-    setPersons(cur => cur.concat(newPerson));
-    setNewName('');
-    setNewNumber('');
-    //console.log(persons)
+
+    const indexCheck = persons.findIndex(el => el.name === newName)
+    console.log(indexCheck);
+    
+    if (indexCheck !== -1){
+      const curId = persons[indexCheck].id;
+      if(window.confirm(`Do you want to overwrite ${newName}?`)){
+        noteServices.PUTrequest(newPerson, curId)
+          .then(x => {
+            setPersons(persons.map(el => el.id === curId ? x : el));
+            setNewName('');
+            setNewNumber('');
+          })
+      }
+      return 0;
+    }
+
+    noteServices.POSTrequest(newPerson)
+      .then(x => {
+        setPersons(cur => cur.concat(x));
+        setNewName('');
+        setNewNumber('');
+      })
   }
 
+  //delete record
+  const deleteRecord = (id) => {
+    const currentPerson = persons.filter(el=>{ return el.id === id })[0];
+    if (!window.confirm(`Do you want to delete ${currentPerson.name}`)) return 0;
+
+    noteServices.DELETErequest(id)
+      .then(x => {
+        const newPersons = persons.filter(el=>{ return el.id !== id});
+        setPersons(newPersons)}
+    )
+  }
 
   //handlers
   const handleNewName = (event) => {
@@ -52,6 +76,7 @@ const App = () => {
     setSearhBar(event.target.value);
   }
 
+  //searchbar
   const personsToShow = persons.filter(el => el.name.includes(searchBar))
 
   return (
@@ -66,7 +91,10 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow}/>
+      <Persons
+        personsToShow={personsToShow}
+        deleteRecord={deleteRecord}
+      />
     </div>
   )
 }
