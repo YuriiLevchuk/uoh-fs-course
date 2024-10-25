@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import noteServices from './services/notes'
-import axios from 'axios'
 
+import Notification from './components/Notification';
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
@@ -12,6 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchBar, setSearhBar] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [isError, setIsError] = useState(false);
 
   useEffect(()=>{
     noteServices.GETrequest()
@@ -36,8 +38,25 @@ const App = () => {
         noteServices.PUTrequest(newPerson, curId)
           .then(x => {
             setPersons(persons.map(el => el.id === curId ? x : el));
+
+            setNotificationMessage(`${newName} was overwritten!`);
+            setTimeout(() => {
+              setNotificationMessage(null)}
+            ,3500);
+
             setNewName('');
             setNewNumber('');
+          })
+          .catch(error => {
+            setNotificationMessage(`${newName} has already been removed from the server!`);
+            setIsError(true);
+
+            setTimeout(() => {setNotificationMessage(null);
+              setIsError(false);
+            }, 3500);
+            
+            const newPersons = persons.filter(el=>{ return el.id !== curId});
+            setPersons(newPersons);
           })
       }
       return 0;
@@ -46,6 +65,10 @@ const App = () => {
     noteServices.POSTrequest(newPerson)
       .then(x => {
         setPersons(cur => cur.concat(x));
+
+        setNotificationMessage(`${newName} was added!`);
+        setTimeout(() => setNotificationMessage(null), 3500);
+
         setNewName('');
         setNewNumber('');
       })
@@ -82,6 +105,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} isError={isError}/>
+
       <Filter searchBar={searchBar} handleSearchBar={handleSearchBar}/>
 
       <h2>Add New Record</h2>
