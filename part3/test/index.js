@@ -3,7 +3,22 @@ const express = require('express');
 const app = express();
 const PORT = 3001;
 
+
+//middleware
+const requestLogger = (request, response, next) => {
+  console.log('Method: ', request.method);
+  console.log('Path: ', request.path);
+  console.log('Body: ', request.body);
+  console.log('------------');
+  next()
+}
+
+const unknownEndpoint = (request,response) =>{
+  response.status(404).send({ error:"unknown path" })
+}
+
 app.use(express.json());
+app.use(requestLogger);
 
 let notes = [
   {
@@ -77,6 +92,7 @@ app.post('/api/notes', (request, response) => {
   response.json(note);
 })
 
+app.use(unknownEndpoint);
 
 app.listen(PORT, ()=>{
   console.log(`server running on port: ${PORT}`);
