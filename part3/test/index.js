@@ -1,7 +1,8 @@
 // const http = require('http')
 const express = require('express');
+const cors = require('cors');
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 
 //middleware
@@ -18,7 +19,9 @@ const unknownEndpoint = (request,response) =>{
 }
 
 app.use(express.json());
+app.use(express.static('dist'));
 app.use(requestLogger);
+app.use(cors());
 
 let notes = [
   {
