@@ -8,7 +8,7 @@
     "dev": "nodemon index.js",
     "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd C:/Users/Liova/OneDrive/Documents/GitHub/uoh-fs-course/part2/notes && npm run build && @powershell Copy-Item dist -Recurse C:/Users/Liova/OneDrive/Documents/GitHub/uoh-fs-course/part3/test",
     "deploy": "fly deploy",
-    "deploy:full": "npm run build:ui && npm run deploy",    
+    "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs"
   },
   "author": "Yurii Levchuk",
@@ -16,7 +16,9 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.7.3"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.9",

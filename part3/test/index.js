@@ -4,7 +4,6 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-
 //middleware
 const requestLogger = (request, response, next) => {
   console.log('Method: ', request.method);
