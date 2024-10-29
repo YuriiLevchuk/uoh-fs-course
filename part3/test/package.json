@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node --env-file=.env index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd C:/Users/Liova/OneDrive/Documents/GitHub/uoh-fs-course/part2/notes && npm run build && @powershell Copy-Item dist -Recurse C:/Users/Liova/OneDrive/Documents/GitHub/uoh-fs-course/part3/test",
@@ -16,6 +16,7 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mongodb": "^6.10.0",
     "mongoose": "^8.7.3"
