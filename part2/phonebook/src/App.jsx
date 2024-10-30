@@ -72,6 +72,16 @@ const App = () => {
         setNewName('');
         setNewNumber('');
       })
+      .catch( err=>{
+        console.log(err.response.data.error);
+
+        setNotificationMessage(err.response.data.error);
+        setIsError(true);
+
+        setTimeout(() => {setNotificationMessage(null);
+          setIsError(false);
+        }, 3500);
+      })
   }
 
   //delete record
