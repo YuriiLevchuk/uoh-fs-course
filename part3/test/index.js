@@ -15,8 +15,8 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-const errorHandler = (error, request, resonse, next) =>{
-  console.error(error);
+const errorHandler = (error, request, resonse, next) => {
+  console.error(error)
 
   if(error.name === 'CastError'){
     return resonse.status(400).send({ error: 'malformated id' })
@@ -24,7 +24,7 @@ const errorHandler = (error, request, resonse, next) =>{
     return resonse.status(400).send({ error: error.message })
   }
 
-  next(error);
+  next(error)
 }
 
 const cors = require('cors')
@@ -66,7 +66,7 @@ app.post('/api/notes', (request, response, next) => {
     .then(savedNote => {
       response.json(savedNote)
     })
-    .catch( err=>next(err) );
+    .catch( err => next(err) )
 })
 
 app.get('/api/notes/:id', (request, response, next) => {
@@ -78,28 +78,28 @@ app.get('/api/notes/:id', (request, response, next) => {
         response.status(404).end()
       }
     })
-    .catch(error => next(error));
+    .catch(error => next(error))
 })
 
-app.delete('/api/notes/:id', (request, response) => {
+app.delete('/api/notes/:id', (request, response, next) => {
   Note.findByIdAndDelete(request.params.id)
-    .then( el=>{
-      response.status(204).end();
+    .then( () => {
+      response.status(204).end()
     })
-    .catch( error=>next(error) )
+    .catch( error => next(error) )
 })
 
-app.put('/api/notes/:id', (request, response, next)=>{
-  const { content, important } = request.body;
+app.put('/api/notes/:id', (request, response, next) => {
+  const { content, important } = request.body
 
   Note.findByIdAndUpdate(
-    request.params.id, 
-    { content, important }, 
+    request.params.id,
+    { content, important },
     { new:true, runValidators:true, context:'query' })
-      .then( el=>{
-        response.json(el);
-      })
-      .catch( err=>next(err) );
+    .then( el => {
+      response.json(el)
+    })
+    .catch( err => next(err) )
 })
 
 app.use(unknownEndpoint)
