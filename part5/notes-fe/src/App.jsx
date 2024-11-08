@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Note from './components/Note'
 import Notification from './components/Notification'
 import noteService from './services/notes'
+import loginService from './services/login'
 
 const Footer = () => {
   const footerStyle = {
@@ -22,7 +23,11 @@ const App = () => {
   const [newNote, setNewNote] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
 
+  //effect hooks//
   useEffect(()=>{
     noteService.getAll()
       .then(initialNotes => {
@@ -30,6 +35,16 @@ const App = () => {
       })
   }, [])
 
+  useEffect(()=>{
+    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      noteService.setToken(user.token)
+    }
+  }, [])
+
+  // handlers //
   const addNote = event => {
     event.preventDefault();
 
@@ -54,6 +69,30 @@ const App = () => {
     setNewNote(event.target.value)
   }
 
+  const handleLogin = async(event) => {
+    event.preventDefault()
+    //console.log('logging in with', username, password)
+
+    try {
+      const user = await loginService.login(
+        { username, password });
+      
+      window.localStorage.setItem(
+        'loggedNoteappUser', JSON.stringify(user)
+      ) 
+      noteService.setToken(user.token);
+      setUser(user);
+      
+      setUsername('');
+      setPassword('');
+    } catch(exception){
+      setErrorMessage('Wrond Credentials')
+      setTimeout(()=>{
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
   const toggleImportance = id => {
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important }
@@ -72,40 +111,79 @@ const App = () => {
         setNotes(notes.filter(n => n.id !== id))
       })
   }
+
+
+  //generate forms//
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
+      <div>
+        username
+          <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password
+          <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>      
+  )
+
+  const noteForm = () => (
+    <form onSubmit={addNote}>
+      <input
+        value={newNote}
+        onChange={handleNoteChange}
+      />
+      <button type="submit">save</button>
+    </form>  
+  )
+
+  //rendering only important if button is toggled//
   const notesToShow = showAll 
     ? notes 
     : notes.filter(note => note.important)
 
+  //return app//
   return (
     <div>
       <h1>Notes</h1>
-      <Notification message={errorMessage}/>
+
+      <Notification message={errorMessage} />
+
+      {user === null 
+        ? loginForm() 
+        : <div>
+          <p>{user.name} logged-in</p>
+          {noteForm()}
+        </div>  
+      }
 
       <div>
-        <button onClick={()=>{setShowAll(x => !x)}}>
-          show {showAll ? "all" : "important"}
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? 'important' : 'all'}
         </button>
       </div>
-
       <ul>
-        {notesToShow.map(note => 
-          <Note 
-            key={note.id} 
-            note={note}
-            toggleImportance={()=>toggleImportance(note.id)}
+        {notesToShow.map((note, i) => 
+          <Note
+            key={i}
+            note={note} 
+            toggleImportance={() => toggleImportanceOf(note.id)}
           />
-        )} 
+        )}
       </ul>
 
-      <form onSubmit={addNote}>
-        <input
-          value={newNote}
-          onChange={handleNoteChange}
-        />
-        <button type="submit">save</button>
-      </form>
-
-      <Footer/>
+      <Footer />
     </div>
   )
 }
