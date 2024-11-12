@@ -13,8 +13,7 @@ const Note = ({ note, toggleImportance }) => {
 }
 
 Note.propTypes = {
-  note: PropTypes.func.isRequired,
-  toggleImportance: PropTypes.func.isRequired
+  note: PropTypes.object.isRequired
 }
 
 export default Note
