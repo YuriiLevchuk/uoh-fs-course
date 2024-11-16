@@ -1,8 +1,16 @@
 const { describe, test, expect, beforeEach } = require('@playwright/test')
 
 describe('Note app', () => {
-  beforeEach(async({ page }) => {
+  beforeEach(async({ page, request }) => {
     await page.goto('http://localhost:5173')
+    await request.post('http://localhost:3001/api/testing/reset')
+    await request.post('http://localhost:3001/api/users', {
+      data: {
+        name: '123',
+        username: '123',
+        password: '123'
+      }
+    })
   })
 
   test('front page can be opened', async ({ page }) => {
@@ -20,4 +28,48 @@ describe('Note app', () => {
   
     await expect(page.getByText('123 logged in')).toBeVisible()
   })
+
+  test('login fails with wrong password', async ({ page }) => {
+    await page.getByRole('button', { name: 'log in' }).click()
+    await page.getByTestId('username').fill('123')
+    await page.getByTestId('password').fill('wr0ng_p455w0rd (ToT)')
+    await page.getByRole('button', { name: 'login' }).click()
+
+    const errorDiv = await page.locator('.error')
+    await expect(errorDiv).toContainText('wrong credentials')
+    await expect(errorDiv).toHaveCSS('border-style', 'solid')
+    await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
+
+    await expect(page.getByText('wrong credentials')).toBeVisible()
+    await expect(page.getByText('123 logged in')).not.toBeVisible()
+  })
+
+  describe('when logged in', () => {
+    beforeEach(async ({ page }) => {
+      await page.getByRole('button', { name: 'log in' }).click()
+      await page.getByTestId('username').fill('123')
+      await page.getByTestId('password').fill('123')
+      await page.getByRole('button', { name: 'login' }).click()
+    })
+
+    test('a new note can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'new note' }).click()
+      await page.getByRole('textbox').fill('a note created by playwright')
+      await page.getByRole('button', { name: 'save' }).click()
+      await expect(page.getByText('a note created by playwright')).toBeVisible()
+    })
+
+    describe('and a note exists', () => {
+      beforeEach(async ({ page }) => {
+        await page.getByRole('button', { name: 'new note' }).click()
+        await page.getByRole('textbox').fill('another note by playwright')
+        await page.getByRole('button', { name: 'save' }).click()
+      })
+  
+      test('importance can be changed', async ({ page }) => {
+        await page.getByRole('button', { name: 'important' }).last().click()
+        await expect(page.getByText('Note app, Department of Computer Science, University of Helsinki 2024')).toBeVisible()
+      })
+    })
+  })  
 })
