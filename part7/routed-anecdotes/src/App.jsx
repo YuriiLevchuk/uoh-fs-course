@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { 
   BrowserRouter as Router,
-  Routes, Route, useNavigate
+  Routes, Route
  } from 'react-router-dom'
 
 import Menu from './components/Menu'
@@ -9,53 +9,9 @@ import AnecdoteList from './components/AnecdoteList'
 import Anecdote from './components/Anecdote'
 import About from './components/About'
 import Footer from './components/Footer'
+import CreateNew from './components/CreateNew'
 
 
-const CreateNew = ({addNew, setNotification}) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
-
-  const navigate = useNavigate()
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    addNew({
-      content,
-      author,
-      info,
-      votes: 0
-    })
-    navigate('/')
-
-    setNotification(`Created a new anecdote "${content}"`)
-    setTimeout(() => {
-      setNotification('')
-    }, 5000)
-  }
-
-  return (
-    <div>
-      <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
-        </div>
-        <div>
-          author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
-        </div>
-        <div>
-          url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
-        </div>
-        <button>create</button>
-      </form>
-    </div>
-  )
-
-}
 
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
