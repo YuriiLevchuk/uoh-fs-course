@@ -1,87 +1,82 @@
-import { useState } from 'react';
-import blogServices from '../services/blogs';
-import PropTypes from 'prop-types';
+import { useState } from "react";
+import blogServices from "../services/blogs";
+import PropTypes from "prop-types";
 
-import Notification from './Notification';
-
+import { useDispatch } from "react-redux";
+import { setNotification, setError } from "../reducers/notificationReducer";
 const CreateBlogForm = ({ setBlogs, mock }) => {
-  const [ title, setTitle ] = useState('');
-  const [ author, setAuthor ] = useState('');
-  const [ url, setUrl ] = useState('');
-  const [ notification, setNotification ] = useState(null);
-  const [ isError, setIsError ] = useState(false);
+  const dispatch = useDispatch();
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
-  const handleCreate = async(e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    try{
+    try {
       const newBlog = { title, author, url };
-      if(mock) mock(newBlog);
+      if (mock) mock(newBlog);
       const res = await blogServices.create(newBlog);
 
-      setBlogs( x => x.concat(res));
+      setBlogs((x) => x.concat(res));
 
-      setTitle('');
-      setAuthor('');
-      setUrl('');
-      setNotification(`Created new blog "${newBlog.title}"`);
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+      dispatch(setNotification(`Created new blog "${newBlog.title}"`));
 
-      setIsError(false);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-    }catch(err){
-      setNotification('Failed to create new blog');
-      setIsError(true);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+    } catch (err) {
+      dispatch(setNotification("Failed to create new blog"));
     }
   };
 
-  return<>
-    <Notification notification={notification} error={isError}/>
-    <h2>Create new Blog</h2>
+  return (
+    <>
+      <h2>Create new Blog</h2>
 
-    <form onSubmit={handleCreate}>
+      <form onSubmit={handleCreate}>
+        <div>
+          <label htmlFor="title">title: </label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            value={title}
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </div>
 
-      <div>
-        <label htmlFor="title">title: </label>
-        <input type="text"
-          name="title"
-          id="title"
-          value={title}
-          onChange={ ({ target }) => setTitle(target.value) }
-        />
-      </div>
+        <div>
+          <label htmlFor="author">author: </label>
+          <input
+            type="text"
+            name="author"
+            id="author"
+            value={author}
+            onChange={({ target }) => setAuthor(target.value)}
+          />
+        </div>
 
-      <div>
-        <label htmlFor="author">author: </label>
-        <input type="text"
-          name="author"
-          id="author"
-          value={author}
-          onChange={ ({ target }) => setAuthor(target.value) }
-        />
-      </div>
+        <div>
+          <label htmlFor="url">url: </label>
+          <input
+            type="text"
+            name="url"
+            id="url"
+            value={url}
+            onChange={({ target }) => setUrl(target.value)}
+          />
+        </div>
 
-      <div>
-        <label htmlFor="url">url: </label>
-        <input type="text"
-          name="url"
-          id="url"
-          value={url}
-          onChange={ ({ target }) => setUrl(target.value) }
-        />
-      </div>
-
-      <button name="createBlog" type="submit">Create</button>
-
-    </form>
-  </>;
+        <button name="createBlog" type="submit">
+          Create
+        </button>
+      </form>
+    </>
+  );
 };
 
 CreateBlogForm.propTypes = {
-  setBlogs: PropTypes.func.isRequired
+  setBlogs: PropTypes.func.isRequired,
 };
 
 export default CreateBlogForm;
