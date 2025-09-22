@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
+import {
+  BrowserRouter as Router,
+  Routes,Route,Link,Navigate,useNavigate
+} from "react-router-dom";
 
+import blogService from "./services/blogs";
+
+import UserView from "./components/UserView";
 import Bloglist from "./components/Bloglist";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
+import UsersList from "./components/UsersList";
+import Menu from "./components/Menu";
 
 import { setUser } from "./reducers/userReducer";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,6 +19,7 @@ import { useSelector, useDispatch } from "react-redux";
 const App = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // on mount
   useEffect(() => {
@@ -25,6 +33,7 @@ const App = () => {
   }, [dispatch]);
   // on user change
   useEffect(() => {
+    console.log(user);
     if (user) {
       console.log("effect if fired");
       blogService.setToken(user.token);
@@ -33,18 +42,43 @@ const App = () => {
         JSON.stringify(user),
       );
     }
-  }, [user]);
+    
+  }, [user, navigate]);
 
 
   return (
     <div>
       <Notification />
-      {user === null ? (
-        <LoginForm/>
-      ) : (
-        <Bloglist/>
-      )}
+      <Menu />
+      <Routes>
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/blogs" replace /> : <LoginForm />}
+        />
+
+        <Route
+          path="/blogs"
+          element={user ? <Bloglist /> : <Navigate to="/login" replace />}
+        />
+
+        <Route
+          path="/users"
+          element={user ? <UsersList /> : <Navigate to="/login" replace />}
+        />
+        
+        <Route
+          path="/users/:id"
+          element={user ? <UserView /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          index
+          element={user ? <Navigate to="/blogs" replace /> : <Navigate to="/login" replace />}
+        />
+        
+        {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
+      </Routes>
     </div>
+    
   );
 };
 

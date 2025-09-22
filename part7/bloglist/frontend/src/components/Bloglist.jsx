@@ -18,18 +18,11 @@ const Bloglist = () => {
   useEffect(() => {
     dispatch(initialiseBlogs());
   }, [dispatch]);
-  const handleLogout = () => {
-    window.localStorage.setItem("loggedInBlogUser", null);
-    dispatch(setUser(null));
-  };
+  
 
   return (
     <>
       <h2>Blogs</h2>
-      <div>
-        Logged in as {user.name} &ensp;
-        <button onClick={handleLogout}>Log Out</button>
-      </div>{" "}
       <br />
       <Togglable label="New Note">
         <CreateBlogForm/>

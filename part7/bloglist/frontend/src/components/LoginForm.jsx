@@ -1,38 +1,26 @@
 import { useState, useEffect } from "react";
 import blogService from "../services/blogs";
-import loginService from "../services/login";
-import PropTypes from "prop-types";
 import Togglable from "./Togglable";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification, setError } from "../reducers/notificationReducer";
 import { loginWithInfo } from "../reducers/userReducer";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  useEffect(() => {
-    console.log("effect:" + user);
-    if (user) {
-      console.log("effect if fired");
-      blogService.setToken(user.token);
-      window.localStorage.setItem(
-        "loggedInBlogUser",
-        JSON.stringify(user),
-      );
-      console.log(window.localStorage.getItem("loggedInBlogUser"));
-    }
-  }, [user]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
     const loginInfo = { username, password };
     try {
       await dispatch(loginWithInfo(loginInfo));
+      //navigate("/");
       setUsername("");
       setPassword("");
     } catch (err) {
