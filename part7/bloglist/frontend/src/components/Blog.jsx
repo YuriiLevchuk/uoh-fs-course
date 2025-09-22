@@ -1,11 +1,16 @@
 import { useState } from "react";
 import blogServices from "../services/blogs";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import { deleteBlog, editBlog } from "../reducers/blogsReducer";
+import { useSelector } from "react-redux";
 
-const Blog = ({ blog, user, mock }) => {
+const Blog = ({ id }) => {
+  const blog = useSelector((state) => state.blogs.find(el => el.id === id));
+  const user = useSelector((state) => state.user);
   const [isFullView, setIsFullView] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
-  const [deletionStyle, setDeletionStyle] = useState({ display: "" });
+  
+  const dispatch = useDispatch();
 
   const blogStyle = {
     paddingTop: 10,
@@ -21,15 +26,15 @@ const Blog = ({ blog, user, mock }) => {
   const toggleFullView = () => setIsFullView((x) => !x);
 
   const likeBlog = async () => {
-    if (mock) mock();
     try {
       const likedBlog = {
         ...blog,
-        likes: likes + 1,
-        user: blog.user.id,
+        likes: blog.likes + 1,
+        user: blog.user
       };
-      await blogServices.update(likedBlog);
-      setLikes((x) => x + 1);
+      console.log(blog.user);
+      await dispatch(editBlog(likedBlog));
+      
     } catch (err) {
       console.error("faied to like blog");
     }
@@ -39,8 +44,7 @@ const Blog = ({ blog, user, mock }) => {
     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}?`))
       return 0;
     try {
-      await blogServices.remove(blog);
-      setDeletionStyle({ display: "none" });
+      dispatch(deleteBlog(blog));
     } catch (err) {
       console.log("failed to remove blog");
     }
@@ -65,7 +69,7 @@ const Blog = ({ blog, user, mock }) => {
 
           <p>
             <a href={blog.url}>{blog.url}</a> <br />
-            <a>likes {likes}</a> &ensp;
+            <a>likes {blog.likes}</a> &ensp;
             <button onClick={likeBlog}>like</button> <br />
             {blog.author} <br />
           </p>
@@ -85,14 +89,9 @@ const Blog = ({ blog, user, mock }) => {
 
   return (
     <>
-      <div style={{ ...blogStyle, ...deletionStyle }}>{detailedView()}</div>
+      <div style={{ ...blogStyle }}>{detailedView()}</div>
     </>
   );
-};
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
 };
 
 export default Blog;

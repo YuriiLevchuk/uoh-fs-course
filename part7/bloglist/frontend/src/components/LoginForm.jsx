@@ -1,41 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import blogService from "../services/blogs";
 import loginService from "../services/login";
 import PropTypes from "prop-types";
-
-import Notification from "./Notification";
 import Togglable from "./Togglable";
 
-const LoginForm = ({ user, setUser }) => {
+import { useDispatch, useSelector } from "react-redux";
+import { setNotification, setError } from "../reducers/notificationReducer";
+import { loginWithInfo } from "../reducers/userReducer";
+
+const LoginForm = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [notification, setNotification] = useState(null);
-  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    console.log("effect:" + user);
+    if (user) {
+      console.log("effect if fired");
+      blogService.setToken(user.token);
+      window.localStorage.setItem(
+        "loggedInBlogUser",
+        JSON.stringify(user),
+      );
+      console.log(window.localStorage.getItem("loggedInBlogUser"));
+    }
+  }, [user]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    const loginInfo = { username, password };
     try {
-      const loginInfo = { username, password };
-      const userInput = await loginService.login(loginInfo);
-
-      window.localStorage.setItem(
-        "loggedInBlogUser",
-        JSON.stringify(userInput),
-      );
-      setUser(userInput);
-      blogService.setToken(userInput.token);
-
+      await dispatch(loginWithInfo(loginInfo));
       setUsername("");
       setPassword("");
     } catch (err) {
-      setNotification("Wrong Credentials");
-      setIsError(true);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      console.log(err);
+      dispatch(setError("Wrong Credentials"));
     }
+      
   };
-
+  // window.localStorage.setItem(
+  //   "loggedInBlogUser",
+  //   JSON.stringify(user),
+  // );
   return (
     <>
       <h2>Login to Application</h2>
@@ -73,10 +82,6 @@ const LoginForm = ({ user, setUser }) => {
       </Togglable>
     </>
   );
-};
-
-LoginForm.propTypes = {
-  setUser: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

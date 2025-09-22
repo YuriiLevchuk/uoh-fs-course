@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const notificationSlice = createSlice({
   name: "notification",
-  initialState: { notification: "aaaaaaa", isError: false },
+  initialState: { notification: null, isError: false },
   reducers: {
     setNotification(state, action) {
       console.log("123");

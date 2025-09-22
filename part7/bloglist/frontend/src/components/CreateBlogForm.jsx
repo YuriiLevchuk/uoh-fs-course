@@ -1,10 +1,10 @@
 import { useState } from "react";
 import blogServices from "../services/blogs";
-import PropTypes from "prop-types";
 
 import { useDispatch } from "react-redux";
+import { createNewBlog } from "../reducers/blogsReducer";
 import { setNotification, setError } from "../reducers/notificationReducer";
-const CreateBlogForm = ({ setBlogs, mock }) => {
+const CreateBlogForm = () => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -14,10 +14,7 @@ const CreateBlogForm = ({ setBlogs, mock }) => {
     e.preventDefault();
     try {
       const newBlog = { title, author, url };
-      if (mock) mock(newBlog);
-      const res = await blogServices.create(newBlog);
-
-      setBlogs((x) => x.concat(res));
+      dispatch(createNewBlog(newBlog));
 
       setTitle("");
       setAuthor("");
@@ -73,10 +70,6 @@ const CreateBlogForm = ({ setBlogs, mock }) => {
       </form>
     </>
   );
-};
-
-CreateBlogForm.propTypes = {
-  setBlogs: PropTypes.func.isRequired,
 };
 
 export default CreateBlogForm;

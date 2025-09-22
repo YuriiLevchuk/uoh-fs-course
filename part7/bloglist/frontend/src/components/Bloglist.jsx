@@ -6,17 +6,21 @@ import CreateBlogForm from "./CreateBlogForm";
 import Blog from "./Blog";
 import Togglable from "./Togglable";
 
-const Bloglist = ({ user, setUser }) => {
-  const [blogs, setBlogs] = useState([]);
+import { useDispatch, useSelector } from "react-redux";
+import { initialiseBlogs } from "../reducers/blogsReducer";
+import { setUser } from "../reducers/userReducer";
+const Bloglist = () => {
+  const blogs = useSelector((state) => state.blogs);
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   // get blogs //
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
-
+    dispatch(initialiseBlogs());
+  }, [dispatch]);
   const handleLogout = () => {
     window.localStorage.setItem("loggedInBlogUser", null);
-    setUser(null);
+    dispatch(setUser(null));
   };
 
   return (
@@ -28,13 +32,13 @@ const Bloglist = ({ user, setUser }) => {
       </div>{" "}
       <br />
       <Togglable label="New Note">
-        <CreateBlogForm setBlogs={setBlogs} />
+        <CreateBlogForm/>
       </Togglable>
       <br />
-      {blogs
+      {[...blogs]
         .sort((a, b) => b.likes - a.likes) // sort array by likes (descending)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} user={user} />
+          <Blog key={blog.id} id={blog.id}/>
         ))}
     </>
   );

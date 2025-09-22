@@ -20,8 +20,8 @@ const create = async (newBlog) => {
 
 const update = async (blog) => {
   const headers = { headers: { Authorization: token } };
-
-  const res = await axios.put(`${baseUrl}/${blog.id}`, blog, headers);
+  const changedBlog = { ...blog, user: blog.user.id };
+  const res = await axios.put(`${baseUrl}/${blog.id}`, changedBlog, headers);
   return res.data;
 };
 

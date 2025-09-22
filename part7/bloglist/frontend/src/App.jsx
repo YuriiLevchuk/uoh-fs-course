@@ -6,27 +6,43 @@ import Bloglist from "./components/Bloglist";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
 
-const App = () => {
-  const [user, setUser] = useState(null);
+import { setUser } from "./reducers/userReducer";
+import { useSelector, useDispatch } from "react-redux";
 
-  // check if user data is in local storage //
+const App = () => {
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  // on mount
   useEffect(() => {
     const loggedInUser = JSON.parse(
       window.localStorage.getItem("loggedInBlogUser"),
     );
-    if (loggedInUser !== null) {
-      setUser(loggedInUser);
+    if (loggedInUser) {
+      dispatch(setUser(loggedInUser));
       blogService.setToken(loggedInUser.token);
     }
-  }, []);
+  }, [dispatch]);
+  // on user change
+  useEffect(() => {
+    if (user) {
+      console.log("effect if fired");
+      blogService.setToken(user.token);
+      window.localStorage.setItem(
+        "loggedInBlogUser",
+        JSON.stringify(user),
+      );
+    }
+  }, [user]);
+
 
   return (
     <div>
       <Notification />
       {user === null ? (
-        <LoginForm user={user} setUser={setUser} />
+        <LoginForm/>
       ) : (
-        <Bloglist user={user} setxser={setUser} />
+        <Bloglist/>
       )}
     </div>
   );
