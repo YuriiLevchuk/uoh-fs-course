@@ -16,12 +16,10 @@ const blogsSlice = createSlice({
     },
     updateBlog(state, action) {
       const blogToChange = action.payload;
-      //const changedBlog = { ...blogToChange, likes: blogToChange.likes + 1 };
       const changedBlogs = state.map(el => el.id !== blogToChange.id ? el : blogToChange);
       console.log(changedBlogs);
       return changedBlogs;
-
-    },
+    }
   },
 });
 
@@ -51,6 +49,14 @@ export const editBlog = (blog) => {
   return async (dispatch) => {
     await blogService.update(blog);
     dispatch(updateBlog(blog));
+  };
+};
+
+export const createComment = (blogId, comment) => {
+  return async (dispatch) => {
+    const blogs = await blogService.addComment(blogId, comment);
+    console.log(blogs);
+    dispatch(updateBlog(blogs));
   };
 };
 

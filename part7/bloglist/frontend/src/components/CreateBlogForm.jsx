@@ -3,7 +3,7 @@ import blogServices from "../services/blogs";
 
 import { useDispatch } from "react-redux";
 import { createNewBlog } from "../reducers/blogsReducer";
-import { setNotification, setError } from "../reducers/notificationReducer";
+import { showNotification } from "../reducers/notificationReducer";
 const CreateBlogForm = () => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
@@ -19,10 +19,10 @@ const CreateBlogForm = () => {
       setTitle("");
       setAuthor("");
       setUrl("");
-      dispatch(setNotification(`Created new blog "${newBlog.title}"`));
+      dispatch(showNotification(`Created new blog "${newBlog.title}"`, 5));
 
     } catch (err) {
-      dispatch(setNotification("Failed to create new blog"));
+      dispatch(showNotification("Failed to create new blog", 5));
     }
   };
 

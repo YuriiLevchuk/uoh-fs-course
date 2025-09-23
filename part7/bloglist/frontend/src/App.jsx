@@ -7,6 +7,7 @@ import {
 import blogService from "./services/blogs";
 
 import UserView from "./components/UserView";
+import BlogView from "./components/BlogView";
 import Bloglist from "./components/Bloglist";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
@@ -33,9 +34,7 @@ const App = () => {
   }, [dispatch]);
   // on user change
   useEffect(() => {
-    console.log(user);
     if (user) {
-      console.log("effect if fired");
       blogService.setToken(user.token);
       window.localStorage.setItem(
         "loggedInBlogUser",
@@ -70,6 +69,12 @@ const App = () => {
           path="/users/:id"
           element={user ? <UserView /> : <Navigate to="/login" replace />}
         />
+
+        <Route
+          path="/blogs/:id"
+          element={user ? <BlogView /> : <Navigate to="/login" replace />}
+        />
+
         <Route
           index
           element={user ? <Navigate to="/blogs" replace /> : <Navigate to="/login" replace />}
