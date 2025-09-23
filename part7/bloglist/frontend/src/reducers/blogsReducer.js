@@ -17,7 +17,6 @@ const blogsSlice = createSlice({
     updateBlog(state, action) {
       const blogToChange = action.payload;
       const changedBlogs = state.map(el => el.id !== blogToChange.id ? el : blogToChange);
-      console.log(changedBlogs);
       return changedBlogs;
     }
   },
@@ -52,11 +51,15 @@ export const editBlog = (blog) => {
   };
 };
 
-export const createComment = (blogId, comment) => {
+export const createComment = (blog, comment) => {
   return async (dispatch) => {
-    const blogs = await blogService.addComment(blogId, comment);
-    console.log(blogs);
-    dispatch(updateBlog(blogs));
+    await blogService.addComment(blog.id, comment);
+    dispatch(updateBlog({
+      ...blog, 
+      comments: blog.comments === undefined 
+        ? [comment] //handle first comment
+        : blog.comments.concat(comment)
+    }));
   };
 };
 

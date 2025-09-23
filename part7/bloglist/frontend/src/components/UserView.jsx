@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import usersService from "../services/users";
+import Blog from "./Blog";
 import { useParams } from "react-router-dom";
+import { Table } from "react-bootstrap";
 const UserView = () => {
   const [ viewedUser, setViewedUser ] = useState(null);
   const id = useParams().id;
@@ -9,7 +11,6 @@ const UserView = () => {
     usersService
       .getAll()
       .then((r) => {
-        console.log(r);
         const viewedUser = r.find((u) => u.id === id);
         setViewedUser(viewedUser);
       });
@@ -18,13 +19,22 @@ const UserView = () => {
   if (!viewedUser) return null;
   return (
     <div>
-      <h2>{viewedUser.name}</h2>
-      <h3>Added Blogs</h3>
-      <ul>
-        {viewedUser.blogs.map((b) => {
-          return <li key={b.id}>{b.title}</li>;
-        })}
-      </ul>
+      <h2>{viewedUser.name}&apos;s blogs</h2>
+      <Table striped>
+        <tbody>
+          {viewedUser.blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog, index) => (
+              <tr key={blog.id}>
+                <td>{index+1+")"}</td>
+                <td>
+                  <Blog id={blog.id}/>
+                </td>
+                <td>{"votes: " +blog.likes}</td>
+              </tr>
+            ))}
+        </tbody>
+      </Table>
     </div>
   );
 };

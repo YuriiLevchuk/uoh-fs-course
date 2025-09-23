@@ -25,13 +25,12 @@ const notificationSlice = createSlice({
 export const { setNotification, setError, resetNotification } = notificationSlice.actions;
 
 let timeoutId;
-export const showNotification = (message, timeS) => {
+export const showNotification = (message, timeS, isError=false) => {
   return dispatch => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    dispatch(setNotification(message));
-    
+    isError ? dispatch(setError(message)) : dispatch(setNotification(message));
     timeoutId = setTimeout(() => {
       dispatch(resetNotification());
       timeoutId = null;

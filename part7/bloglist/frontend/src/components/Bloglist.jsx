@@ -8,10 +8,11 @@ import Togglable from "./Togglable";
 
 import { useDispatch, useSelector } from "react-redux";
 import { initialiseBlogs } from "../reducers/blogsReducer";
-import { setUser } from "../reducers/userReducer";
+
+import { Table } from "react-bootstrap";
+
 const Bloglist = () => {
   const blogs = useSelector((state) => state.blogs);
-  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   // get blogs //
@@ -24,15 +25,27 @@ const Bloglist = () => {
     <>
       <h2>Blogs</h2>
       <br />
-      <Togglable label="New Note">
+      <Togglable label="New Blog">
         <CreateBlogForm/>
       </Togglable>
       <br />
-      {[...blogs]
-        .sort((a, b) => b.likes - a.likes) // sort array by likes (descending)
-        .map((blog) => (
-          <Blog key={blog.id} id={blog.id}/>
-        ))}
+      <Table striped>
+        <tbody>
+          {[...blogs]
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog, index) => (
+              <tr key={blog.id}>
+                <td>{index+1+")"}</td>
+                <td>
+                  <Blog id={blog.id}/>
+                </td>
+                <td>{"votes: " +blog.likes}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </Table>
+      
     </>
   );
 };

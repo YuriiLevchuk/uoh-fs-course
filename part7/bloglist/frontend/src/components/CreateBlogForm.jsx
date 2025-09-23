@@ -4,6 +4,8 @@ import blogServices from "../services/blogs";
 import { useDispatch } from "react-redux";
 import { createNewBlog } from "../reducers/blogsReducer";
 import { showNotification } from "../reducers/notificationReducer";
+
+import { Form, Button } from "react-bootstrap";
 const CreateBlogForm = () => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
@@ -28,46 +30,44 @@ const CreateBlogForm = () => {
 
   return (
     <>
-      <h2>Create new Blog</h2>
-
-      <form onSubmit={handleCreate}>
-        <div>
-          <label htmlFor="title">title: </label>
-          <input
+      <Form onSubmit={handleCreate}>
+        <Form.Group>
+          <Form.Label htmlFor="title">title: </Form.Label>
+          <Form.Control
             type="text"
             name="title"
             id="title"
             value={title}
             onChange={({ target }) => setTitle(target.value)}
           />
-        </div>
+        </Form.Group>
 
-        <div>
-          <label htmlFor="author">author: </label>
-          <input
+        <Form.Group>
+          <Form.Label htmlFor="author">author: </Form.Label>
+          <Form.Control
             type="text"
             name="author"
             id="author"
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
           />
-        </div>
+        </Form.Group>
 
-        <div>
-          <label htmlFor="url">url: </label>
-          <input
+        <Form.Group>
+          <Form.Label htmlFor="url">url: </Form.Label>
+          <Form.Control
             type="text"
             name="url"
             id="url"
             value={url}
             onChange={({ target }) => setUrl(target.value)}
           />
-        </div>
+        </Form.Group>
 
-        <button name="createBlog" type="submit">
+        <Button variant="dark" name="createBlog" type="submit">
           Create
-        </button>
-      </form>
+        </Button >
+      </Form>
     </>
   );
 };

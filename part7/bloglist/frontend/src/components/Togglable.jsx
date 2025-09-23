@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { Component, useState } from "react";
+import { Button } from "react-bootstrap";
 
 const Togglable = (props) => {
   const { children, label } = props;
@@ -16,18 +17,18 @@ const Togglable = (props) => {
   return (
     <>
       <div style={childrenStyle[0]}>
+        <Button variant="light" name="toggle" onClick={toggleVisibility}>
+          {label} &#707;
+        </Button>
         {" "}
         {/* before unrolling */}
-        <button name="toggle" onClick={toggleVisibility}>
-          {label}
-        </button>
       </div>
 
       <div style={childrenStyle[1]}>
+        <Button variant="light" onClick={toggleVisibility}>{label} &#709;</Button>
         {" "}
         {/* after unrolling */}
         {children}
-        <button onClick={toggleVisibility}>Cancel</button>
       </div>
     </>
   );

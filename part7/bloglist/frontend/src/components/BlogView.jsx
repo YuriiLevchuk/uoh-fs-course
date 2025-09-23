@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { deleteBlog, editBlog, updateBlog, createComment } from "../reducers/blogsReducer";
+import { deleteBlog, editBlog, updateBlog, createComment, setBlogs } from "../reducers/blogsReducer";
 import { useDispatch } from "react-redux";
-import blogService from "../services/blogs";
+
+import { Button } from "react-bootstrap";
 
 const BlogView = () => {
   const id = useParams().id;
@@ -39,8 +40,9 @@ const BlogView = () => {
   };
 
   const addComment = () => {
+    if (!comment) return 0;
     try {
-      dispatch(createComment(blog.id, comment)).then(() => {
+      dispatch(createComment(blog, comment)).then(() => {
         setComment("");
       });
     } catch (err) {
@@ -50,18 +52,18 @@ const BlogView = () => {
 
   if (!blog) return null;
   return <div>
-    <h2>{blog.title}</h2>
+    <h2>{blog.title} <a>by {blog.author}</a></h2>
     <p>
-      <a href={blog.url}>{blog.url}</a> <br />
-      <a>likes {blog.likes}</a> &ensp;
-      <button onClick={likeBlog}>like</button> <br />
-      {blog.author} <br />
+      <Button variant="light" onClick={likeBlog}>&#128077; {blog.likes}</Button> 
+    </p>
+    <p> 
+      <a href={blog.url}>{blog.url}</a>
     </p>
     <p>
       {user.username === blog.user.username ? (
         <>
           <i>this post was added by You</i> <br />
-          <br /> <button onClick={removeBlog}>remove</button>
+          <br /> <Button variant="dark" onClick={removeBlog}>remove</Button>
         </>
       ) : (
         <i>this post was added by @{blog.user.username}</i>
@@ -75,7 +77,7 @@ const BlogView = () => {
       value={comment}
       onChange={({ target }) => setComment(target.value)}
     />
-    <button onClick={addComment}>add comment</button>
+    <Button variant="dark" onClick={addComment}>add comment</Button>
     {blog.comments 
       ? <ul>
         {blog.comments.map((comment, i) => 
